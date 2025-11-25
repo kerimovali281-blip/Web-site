@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Analysis - 100 Language Support</title>
+    <style>
+        /* CSS Başlangıcı */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; color: #333; }
+        .container { max-width: 900px; margin: auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { color: #007bff; border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
+        .menu { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; background-color: #e9ecef; padding: 10px; border-radius: 5px; }
+        #language-select { padding: 8px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; }
+        .content-section { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        label { font-weight: bold; margin-right: 10px; }
+        input[type="date"] { padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+        button { background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px; }
+        button:hover { background-color: #218838; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f2f2f2; color: #555; }
+        /* CSS Bitişi */
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="menu">
+        <span id="menu-title">Language Selection:</span>
+        <select id="language-select" onchange="loadLanguage(this.value)">
+            <option value="en">English</option>
+            <option value="az_latin">Azərbaycanca (Latin)</option>
+            <option value="az_kiril">Азәрбајҹанҹа (Kiril)</option>
+            <option value="tr">Türkçe</option>
+            <option value="ru">Русский</option>
+            <option value="de">Deutsch</option>
+            <option value="fr">Français</option>
+            <option value="es">Español</option>
+            <option value="it">Italiano</option>
+            <option value="pt">Português</option>
+            <option value="zh">中文 (Chinese)</option>
+            <option value="ja">日本語 (Japanese)</option>
+            <option value="ko">한국어 (Korean)</option>
+            <option value="ar">العربية (Arabic)</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+            <option value="fa">فارسی (Persian)</option>
+            <option value="el">Ελληνικά (Greek)</option>
+            <option value="nl">Nederlands</option>
+            <option value="pl">Polski</option>
+            <option value="sv">Svenska</option>
+            <option value="vi">Tiếng Việt</option>
+            <option value="th">ไทย (Thai)</option>
+            <option value="id">Bahasa Indonesia</option>
+            <option value="cs">Čeština</option>
+            <option value="da">Dansk</option>
+            <option value="hu">Magyar</option>
+            <option value="ro">Română</option>
+            <option value="uk">Українська</option>
+            <option value="ko_kiril_example">한국어 (Kiril Örnek)</option>
+            <option value="ga">Gaeilge (Irish)</option>
+            </select>
+    </div>
+
+    <h1 id="title">Birthday Analysis</h1>
+
+    <div>
+        <label for="dob-input" id="label-dob">Your Date of Birth:</label>
+        <input type="date" id="dob-input" value="2000-05-20">
+        <button onclick="analyzeBirthday()" id="analyze-button">Analyze</button>
+    </div>
+
+    <div class="content-section">
+        <h2 id="section-title">Results</h2>
+        <table id="results-table">
+            <thead>
+                <tr>
+                    <th id="th-category">Category</th>
+                    <th id="th-info">Information</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td id="td-zodiac-cat">Zodiac Sign and Period</td><td id="td-zodiac-info">Please select a date and analyze.</td></tr>
+                <tr><td id="td-famous-cat">Famous Birthdays</td><td id="td-famous-info"></td></tr>
+                <tr><td id="td-historic-cat">Historical Figures</td><td id="td-historic-info"></td></tr>
+                <tr><td id="td-event-cat">Observance of the Day</td><td id="td-event-info"></td></tr>
+            </tbody>
+        </table>
+        <p id="gemini-note" style="margin-top: 20px;">**Note:** This area will offer deeper, personalized analyses with **Gemini API** integration (Server-side required).</p>
+    </div>
+
+</div>
+
+<script>
+    // JSON Veri Yapısı (30 Dil İçin Örnek)
+    const translations = {
+        // 1- Azerbaycanca (Latin)
+        "az_latin": {
+            "menu-title": "Dil Seçimi",
+            "title": "Doğum Günü Analizi",
+            "label-dob": "Doğum Tarixiniz:",
+            "analyze-button": "Analiz Et",
+            "section-title": "Nəticələr",
+            "th-category": "Kateqoriya",
+            "th-info": "Məlumat",
+            "td-zodiac-cat": "Bürc və Dövr",
+            "td-famous-cat": "Doğulan Məşhurlar",
+            "td-historic-cat": "Tarixi Şəxsiyyətlər",
+            "td-event-cat": "O Günün Qeyd Etməsi",
+            "initial-info": "Zəhmət olmasa bir tarix seçib analiz edin.",
+            "gemini-note": "**Qeyd:** Bu sahə, **Gemini API** inteqrasiyası ilə daha dərin və fərdiləşdirilmiş analizlər təqdim edəcək (Server tərəfi tələb olunur)."
+        },
+        // 2- Azerbaycanca (Kiril)
+        "az_kiril": {
+            "menu-title": "Дил Сечими",
+            "title": "Доғум Ҝүнү Анализи",
+            "label-dob": "Доғум Тарихиниз:",
+            "analyze-button": "Анализ Ет",
+            "section-title": "Нәтиҹәләр",
+            "th-category": "Категорија",
+            "th-info": "Мәлумат",
+            "td-zodiac-cat": "Бүръ вә Дөвр",
+            "td-famous-cat": "Доғулан Мәшһурлар",
+            "td-historic-cat": "Тарихи Шәхсијјәтләр",
+            "td-event-cat": "О Ҝүнүн Гејд Етмәси",
+            "initial-info": "Зәһмәт олмаса бир tarix сечиб анализ един.",
+            "gemini-note": "**Гејд:** Бу саһә, **Gemini API** интеграсијасы илә даһа дәрин вә фәрдиләшдирилмиш анализләр тәгдим едәҹәк (Сервер тәрәфи тәләб олунур)."
+        },
+        // 3- Türkçe
+        "tr": {
+            "menu-title": "Dil Seçimi",
+            "title": "Doğum Günü Analizi",
+            "label-dob": "Doğum Tarihiniz:",
+            "analyze-button": "Analiz Et",
+            "section-title": "Sonuçlar",
+            "th-category": "Kategori",
+            "th-info": "Bilgi",
+            "td-zodiac-cat": "Burç ve Dönem",
+            "td-famous-cat": "Doğan Ünlüler",
+            "td-historic-cat": "Tarihi Şahsiyetler",
+            "td-event-cat": "O Günün Kutlaması",
+            "initial-info": "Lütfen bir tarih seçip analiz edin.",
+            "gemini-note": "**Not:** Bu alan, **Gemini API** entegrasyonu ile daha derin ve kişiselleştirilmiş analizler sunacaktır (Sunucu tarafı gereklidir)."
+        },
+        // 4- İngilizce (Varsayılan olarak bu kod kullanılacak)
+        "en": {
+            "menu-title": "Language Selection",
+            "title": "Birthday Analysis",
+            "label-dob": "Your Date of Birth:",
+            "analyze-button": "Analyze",
+            "section-title": "Results",
+            "th-category": "Category",
+            "th-info": "Information",
+            "td-zodiac-cat": "Zodiac Sign and Period",
+            "td-famous-cat": "Famous Birthdays",
+            "td-historic-cat": "Historical Figures",
+            "td-event-cat": "Observance of the Day",
+            "initial-info": "Please select a date and analyze.",
+            "gemini-note": "**Note:** This area will offer deeper, personalized analyses with **Gemini API** integration (Server-side required)."
+        },
+        // 5- Rusça (Kiril)
+        "ru": {
+            "menu-title": "Выбор языка",
+            "title": "Анализ дня рождения",
+            "label-dob": "Ваша дата рождения:",
+            "analyze-button": "Анализировать",
+            "section-title": "Результаты",
+            "th-category": "Категория",
+            "th-info": "Информация",
+            "td-zodiac-cat": "Знак зодиака и период",
+            "td-famous-cat": "Известные дни рождения",
+            "td-historic-cat": "Исторические личности",
+            "td-event-cat": "События дня",
+            "initial-info": "Пожалуйста, выберите дату и проанализируйте.",
+            "gemini-note": "**Примечание:** Эта область будет предлагать более глубокий, персонализированный анализ с интеграцией **Gemini API** (требуется серверная часть)."
+        },
+        // 6- Almanca
+        "de": {
+            "menu-title": "Sprachauswahl",
+            "title": "Geburtstagsanalyse",
+            "label-dob": "Ihr Geburtsdatum:",
+            "analyze-button": "Analysieren",
+            "section-title": "Ergebnisse",
+            "th-category": "Kategorie",
+            "th-info": "Information",
+            "td-zodiac-cat": "Sternzeichen und Periode",
+            "td-famous-cat": "Bekannte Geburtstage",
+            "td-historic-cat": "Historische Persönlichkeiten",
+            "td-event-cat": "Feiertag des Tages",
+            "initial-info": "Bitte wählen Sie ein Datum aus und analysieren Sie.",
+            "gemini-note": "**Hinweis:** Dieser Bereich bietet tiefere, personalisierte Analysen mit **Gemini API**-Integration (Server-seitig erforderlich)."
+        },
+        // 7- Fransızca
+        "fr": {
+            "menu-title": "Sélection de la langue",
+            "title": "Analyse d'anniversaire",
+            "label-dob": "Votre date de naissance:",
+            "analyze-button": "Analyser",
+            "section-title": "Résultats",
+            "th-category": "Catégorie",
+            "th-info": "Information",
+            "td-zodiac-cat": "Signe du zodiaque et Période",
+            "td-famous-cat": "Anniversaires Célèbres",
+            "td-historic-cat": "Figures Historiques",
+            "td-event-cat": "Célébration du Jour",
+            "initial-info": "Veuillez sélectionner une date et analyser.",
+            "gemini-note": "**Remarque:** Cette zone offrira des analyses plus approfondies et personnalisées avec l'intégration de l'**API Gemini** (côté serveur requis)."
+        },
+        // 8- İspanyolca
+        "es": {
+            "menu-title": "Selección de idioma",
+            "title": "Análisis de cumpleaños",
+            "label-dob": "Tu fecha de nacimiento:",
+            "analyze-button": "Analizar",
+            "section-title": "Resultados",
+            "th-category": "Categoría",
+            "th-info": "Información",
+            "td-zodiac-cat": "Signo zodiacal y Periodo",
+            "td-famous-cat": "Cumpleaños Famosos",
+            "td-historic-cat": "Personajes Históricos",
+            "td-event-cat": "Celebración del Día",
+            "initial-info": "Por favor, selecciona una fecha y analiza.",
+            "gemini-note": "**Nota:** Esta área ofrecerá análisis más profundos y personalizados con la integración de la **API de Gemini** (se requiere lado del servidor)."
+        },
+        // 9- İtalyanca
+        "it": {
+            "menu-title": "Selezione della lingua",
+            "title": "Analisi del compleanno",
+            "label-dob": "La tua data di nascita:",
+            "analyze-button": "Analizza",
+            "section-title": "Risultati",
+            "th-category": "Categoria",
+            "th-info": "Informazione",
+            "td-zodiac-cat": "Segno zodiacale e Periodo",
+            "td-famous-cat": "Compleanni Famosi",
+            "td-historic-cat": "Figure Storiche",
+            "td-event-cat": "Ricorrenza del Giorno",
+            "initial-info": "Si prega di selezionare una data e analizzare.",
+            "gemini-note": "**Nota:** Questa area offrirà analisi più approfondite e personalizzate con l'integrazione dell'**API Gemini** (richiesta lato server)."
+        },
+        // 10- Portekizce
+        "pt": {
+            "menu-title": "Seleção de Idioma",
+            "title": "Análise de Aniversário",
+            "label-dob": "Sua data de nascimento:",
+            "analyze-button": "Analisar",
+            "section-title": "Resultados",
+            "th-category": "Categoria",
+            "th-info": "Informação",
+            "td-zodiac-cat": "Signo Zodiacal e Período",
+            "td-famous-cat": "Aniversários Famosos",
+            "td-historic-cat": "Figuras Históricas",
+            "td-event-cat": "Comemoração do Dia",
+            "initial-info": "Por favor, selecione uma data e analise.",
+            "gemini-note": "**Nota:** Esta área oferecerá análises mais profundas e personalizadas com a integração da **API Gemini** (necessário lado do servidor)."
+        },
+        // 11- Çince (Basitleştirilmiş)
+        "zh": {
+            "menu-title": "语言选择",
+            "title": "生日分析",
+            "label-dob": "您的出生日期:",
+            "analyze-button": "分析",
+            "section-title": "结果",
+            "th-category": "类别",
+            "th-info": "信息",
+            "td-zodiac-cat": "星座和时期",
+            "td-famous-cat": "名人诞辰",
+            "td-historic-cat": "历史人物",
+            "td-event-cat": "当日纪念",
+            "initial-info": "请选择日期并分析。",
+            "gemini-note": "**注意:** 该区域将通过 **Gemini API** 集成提供更深入、更个性化的分析 (需要服务器端)."
+        },
+        // 12- Japonca
+        "ja": {
+            "menu-title": "言語の選択",
+            "title": "誕生日分析",
+            "label-dob": "生年月日:",
+            "analyze-button": "分析",
+            "section-title": "結果",
+            "th-category": "カテゴリ",
+            "th-info": "情報",
+            "td-zodiac-cat": "星座と期間",
+            "td-famous-cat": "有名人の誕生日",
+            "td-historic-cat": "歴史上の人物",
+            "td-event-cat": "その日の記念日",
+            "initial-info": "日付を選択して分析してください。",
+            "gemini-note": "**注意:** このエリアは、**Gemini API** 統合により、より深くパーソナライズされた分析を提供します (サーバー側が必要です)。"
+        },
+        // 13- Korece
+        "ko": {
+            "menu-title": "언어 선택",
+            "title": "생일 분석",
+            "label-dob": "생년월일:",
+            "analyze-button": "분석",
+            "section-title": "결과",
+            "th-category": "범주",
+            "th-info": "정보",
+            "td-zodiac-cat": "별자리 및 기간",
+            "td-famous-cat": "유명인 생일",
+            "td-historic-cat": "역사적 인물",
+            "td-event-cat": "오늘의 기념일",
+            "initial-info": "날짜를 선택하고 분석하십시오.",
+            "gemini-note": "**참고:** 이 영역은 **Gemini API** 통합을 통해 더 깊고 개인화된 분석을 제공합니다 (서버 측 필요)."
+        },
+        // 14- Arapça
+        "ar": {
+            "menu-title": "اختيار اللغة",
+            "title": "تحليل تاريخ الميلاد",
+            "label-dob": "تاريخ ميلادك:",
+            "analyze-button": "تحليل",
+            "section-title": "النتائج",
+            "th-category": "الفئة",
+            "th-info": "المعلومات",
+            "td-zodiac-cat": "البرج والفترة",
+            "td-famous-cat": "مشاهير المواليد",
+            "td-historic-cat": "شخصيات تاريخية",
+            "td-event-cat": "الاحتفال بهذا اليوم",
+            "initial-info": "يرجى اختيار تاريخ وإجراء التحليل.",
+            "gemini-note": "**ملاحظة:** ستقدم هذه المنطقة تحليلات أعمق وشخصية من خلال تكامل **Gemini API** (يتطلب خادمًا)."
+        },
+        // 15- Hintçe
+        "hi": {
+            "menu-title": "भाषा चयन",
+            "title": "जन्मदिन विश्लेषण",
+            "label-dob": "आपकी जन्मतिथि:",
+            "analyze-button": "विश्लेषण करें",
+            "section-title": "परिणाम",
+            "th-category": "श्रेणी",
+            "th-info": "जानकारी",
+            "td-zodiac-cat": "राशि चक्र और अवधि",
+            "td-famous-cat": "प्रसिद्ध हस्तियों के जन्मदिन",
+            "td-historic-cat": "ऐतिहासिक हस्तियां",
+            "td-event-cat": "उस दिन का उत्सव",
+            "initial-info": "कृपया एक तिथि चुनें और विश्लेषण करें।",
+            "gemini-note": "**ध्यान दें:** यह क्षेत्र **Gemini API** एकीकरण के साथ गहरा, व्यक्तिगत विश्लेषण प्रदान करेगा (सर्वर-साइड आवश्यक)।"
+        },
+        // 16- Farsça
+        "fa": {
+            "menu-title": "انتخاب زبان",
+            "title": "تحلیل روز تولد",
+            "label-dob": "تاریخ تولد شما:",
+            "analyze-button": "تحلیل کنید",
+            "section-title": "نتایج",
+            "th-category": "دسته بندی",
+            "th-info": "اطلاعات",
+            "td-zodiac-cat": "برج و دوره",
+            "td-famous-cat": "تولدهای مشهور",
+            "td-historic-cat": "شخصیت های تاریخی",
+            "td-event-cat": "جشن آن روز",
+            "initial-info": "لطفا یک تاریخ انتخاب کرده و تحلیل کنید.",
+            "gemini-note": "**توجه:** این منطقه تحلیل های عمیق تر و شخصی سازی شده را با یکپارچه سازی **API Gemini** ارائه می دهد (نیاز به سمت سرور دارد)."
+        },
+        // 17- Yunanca
+        "el": {
+            "menu-title": "Επιλογή γλώσσας",
+            "title": "Ανάλυση Γενεθλίων",
+            "label-dob": "Ημερομηνία γέννησής σας:",
+            "analyze-button": "Ανάλυση",
+            "section-title": "Αποτελέσματα",
+            "th-category": "Κατηγορία",
+            "th-info": "Πληροφορία",
+            "td-zodiac-cat": "Ζώδιο και Περίοδος",
+            "td-famous-cat": "Διάσημοι Γενέθλια",
+            "td-historic-cat": "Ιστορικές Φιγούρες",
+            "td-event-cat": "Εορτασμός της Ημέρας",
+            "initial-info": "Παρακαλώ επιλέξτε μια ημερομηνία και αναλύστε.",
+            "gemini-note": "**Σημείωση:** Αυτή η περιοχή θα προσφέρει βαθύτερες, εξατομικευμένες αναλύσεις με ενσωμάτωση **Gemini API** (απαιτείται πλευρά διακομιστή)."
+        },
+        // 18- Hollandaca
+        "nl": {
+            "menu-title": "Taalselectie",
+            "title": "Verjaardagsanalyse",
+            "label-dob": "Uw geboortedatum:",
+            "analyze-button": "Analyseer",
+            "section-title": "Resultaten",
+            "th-category": "Categorie",
+            "th-info": "Informatie",
+            "td-zodiac-cat": "Sterrenbeeld en Periode",
+            "td-famous-cat": "Beroemde Verjaardagen",
+            "td-historic-cat": "Historische Figuren",
+            "td-event-cat": "Viering van de Dag",
+            "initial-info": "Selecteer een datum en analyseer.",
+            "gemini-note": "**Opmerking:** Dit gebied biedt diepere, gepersonaliseerde analyses met **Gemini API**-integratie (Server-side vereist)."
+        },
+        // 19- Lehçe
+        "pl": {
+            "menu-title": "Wybór języka",
+            "title": "Analiza Urodzin",
+            "label-dob": "Twoja data urodzenia:",
+            "analyze-button": "Analizuj",
+            "section-title": "Wyniki",
+            "th-category": "Kategoria",
+            "th-info": "Informacje",
+            "td-zodiac-cat": "Znak zodiaku i Okres",
+            "td-famous-cat": "Sławne Urodziny",
+            "td-historic-cat": "Postacie Historyczne",
+            "td-event-cat": "Obchody Dnia",
+            "initial-info": "Proszę wybrać datę i przeanalizować.",
+            "gemini-note": "**Uwaga:** Ten obszar zaoferuje głębsze, spersonalizowane analizy dzięki integracji **Gemini API** (wymagana strona serwera)."
+        },
+        // 20- İsveççe
+        "sv": {
+            "menu-title": "Språkval",
+            "title": "Födelsedagsanalys",
+            "label-dob": "Ditt födelsedatum:",
+            "analyze-button": "Analysera",
+            "section-title": "Resultat",
+            "th-category": "Kategori",
+            "th-info": "Information",
+            "td-zodiac-cat": "Stjärntecken och Period",
+            "td-famous-cat": "Kända Födelsedagar",
+            "td-historic-cat": "Historiska Figurer",
+            "td-event-cat": "Dagens Högtid",
+            "initial-info": "Vänligen välj ett datum och analysera.",
+            "gemini-note": "**Obs:** Detta område kommer att erbjuda djupare, personlig analys med **Gemini API**-integration (server-sida krävs)."
+        },
+        // 21- Vietnamca
+        "vi": {
+            "menu-title": "
